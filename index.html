@@ -1,16 +1,25 @@
 <html>
 <head>
-  <title>NoteCircle5000</title>
+  <title>WebMidi Circle Of Fifths</title>
   <script src="https://cdn.jsdelivr.net/npm/webmidi"></script>
-  <script src="main.js"></script>
   <meta charset="utf-8"/>
 <style>
-.on {
-  fill: url("#MyGradient");
+#infobox {
+    position: absolute;
+    bottom: 0;
+    margin: .5em;
+    padding: .5em;
+    background: black;
+    color: white;
+    font-family: monospace;
 }
-.off {
-  fill: white;
+#infobox:hover {
+    opacity: 1;
+    transition: opacity .5s ease-out;
 }
+.on {fill: url("#NoteOnGradient");}
+.off {fill: white;}
+.clickable {cursor: pointer;}
 html, body {
   margin:0px;
   /* padding:20px; */
@@ -26,86 +35,135 @@ svg {
 }
 svg > g > text {
   font: bold 20px sans-serif;
+  cursor: default;
 }
-[data-n="1"] {
+svg > g > circle {
+  transition-property: fill-opacity;
+}
+
+.cover {
+  fill-opacity: 0;
+  fill: white;
+}
+
+[data-n="-1"] {
     stroke-width: 2;
+    fill-opacity: 0;
+    fill: url("#NoteOnGradient");
+    transition: fill-opacity 10s cubic-bezier(.1,1,1,1);
+}
+[data-n="0"] {
+    stroke-width: 2;
+    transition-duration: 10s;
+}
+[data-n="0"].on + .cover {
+    fill-opacity: 1;
+    transition: fill-opacity .5s;
+}
+
+
+[data-n="1"] {
+    stroke-width: 2.25;
+    fill-opacity: 1;
+    /*
+    transition: fill-opacity 0s;
+    */
 }
 [data-n="2"] {
     stroke-width: 3;
+    fill-opacity: 1;
 }
 [data-n="3"] {
-    stroke-width: 4;
+    stroke-width: 3.5;
 }
 [data-n="4"] {
-    stroke-width: 5;
+    stroke-width: 4;
 }
+
 
 </style>
 </head>
 <body>
 <div>
  <svg viewBox="0 0 250 250">
-  <g transform="translate(125,225)">
-      <circle class="off" id="c7"  cx="0" cy="0" r="22" stroke="black" stroke-width="2" data-n="0"/>
-      <text text-anchor="middle" alignment-baseline="central">G♭</text>  
-  </g>
-  <g transform="translate(75,211.6)">
-      <circle class="off" id="c8"  cx="0" cy="0" r="22" stroke="black" stroke-width="2" data-n="0"/>
-      <text text-anchor="middle" alignment-baseline="central">G</text>
-  </g>
-  <g transform="translate(38.4,175)">
-      <circle class="off" id="c9"  cx="0" cy="0" r="22" stroke="black" stroke-width="2" data-n="0"/>
-      <text text-anchor="middle" alignment-baseline="central">A♭</text>
-  </g>
-
-  <!-- -->
-  <g transform="translate(25,125)">
-      <circle class="off" id="c10" cx="0" cy="0" r="22" stroke="black" stroke-width="2" data-n="0"/>
-     <text text-anchor="middle" alignment-baseline="central">A</text>
-  </g>
-  <g transform="translate(38.4,75)">
-      <circle class="off" id="c11" cx="0" cy="0" r="22" stroke="black" stroke-width="2" data-n="0"/>
-      <text text-anchor="middle" alignment-baseline="central">B♭</text>
-  </g>
-  <g transform="translate(75,38.4)">
-      <circle class="off" id="c12" cx="0" cy="0" r="22" stroke="black" stroke-width="2" data-n="0"/>
-      <text text-anchor="middle" alignment-baseline="central">B</text>
-  </g>
-
-  <!-- -->
-  <g transform="translate(125,25)">
+  <g id="g1" transform="translate(125,25)">
       <circle class="off" id="c1"  cx="0" cy="0" r="22" stroke="black" stroke-width="2" data-n="0"/>
-      <text text-anchor="middle" alignment-baseline="central">C</text>
+      <text text-anchor="middle" alignment-baseline="central" >C</text>
   </g>
-  <g transform="translate(175,38.4)">
+  <g id="g2" transform="translate(175,38.4)">
       <circle class="off" id="c2"  cx="0" cy="0" r="22" stroke="black" stroke-width="2" data-n="0"/>
-      <text text-anchor="middle" alignment-baseline="central">D♭</text>
+      <text class="clickable" text-anchor="middle" alignment-baseline="central" onclick='switchText(this)'>D♭</text>
   </g>
-  <g transform="translate(211.6,75)">
+  <g id="g3" transform="translate(211.6,75)">
       <circle class="off" id="c3"  cx="0" cy="0" r="22" stroke="black" stroke-width="2" data-n="0"/>
       <text text-anchor="middle" alignment-baseline="central">D</text>
   </g>
 
-  <!-- -->
-  <g transform="translate(225,125)">
+  <!-- spacer -->
+
+  <g id="g4" transform="translate(225,125)">
       <circle class="off" id="c4"  cx="0" cy="0" r="22" stroke="black" stroke-width="2" data-n="0"/>
-      <text text-anchor="middle" alignment-baseline="central">E♭</text>
+      <text class="clickable" text-anchor="middle" alignment-baseline="central" onclick='switchText(this)'>E♭</text>
   </g>
-  <g transform="translate(211.6,175)">
+  <g id="g5" transform="translate(211.6,175)">
       <circle class="off" id="c5"  cx="0" cy="0" r="22" stroke="black" stroke-width="2" data-n="0"/>
       <text text-anchor="middle" alignment-baseline="central">E</text>
   </g>
-  <g transform="translate(175,211.6)">
+  <g id="g6" transform="translate(175,211.6)">
       <circle class="off" id="c6"  cx="0" cy="0" r="22" stroke="black" stroke-width="2" data-n="0"/>
       <text text-anchor="middle" alignment-baseline="central">F</text>
   </g>
+
+  <!-- spacer -->
+
+  <g id="g7" transform="translate(125,225)">
+      <circle class="off" id="c7"  cx="0" cy="0" r="22" stroke="black" stroke-width="2" data-n="0"/>
+      <text class="clickable" text-anchor="middle" alignment-baseline="central" onclick='switchText(this)'>G♭</text>  
+  </g>
+  <g id="g8" transform="translate(75,211.6)">
+      <circle class="off" id="c8"  cx="0" cy="0" r="22" stroke="black" stroke-width="2" data-n="0"/>
+      <text text-anchor="middle" alignment-baseline="central">G</text>
+  </g>
+  <g id="g9" transform="translate(38.4,175)">
+      <circle class="off" id="c9"  cx="0" cy="0" r="22" stroke="black" stroke-width="2" data-n="0"/>
+      <text class="clickable" text-anchor="middle" alignment-baseline="central" onclick='switchText(this)'>A♭</text>
+  </g>
+
+  <!-- spacer -->
+
+  <g id="g10" transform="translate(25,125)">
+      <circle class="off" id="c10" cx="0" cy="0" r="22" stroke="black" stroke-width="2" data-n="0"/>
+     <text text-anchor="middle" alignment-baseline="central">A</text>
+  </g>
+  <g id="g11" transform="translate(38.4,75)">
+      <circle class="off" id="c11" cx="0" cy="0" r="22" stroke="black" stroke-width="2" data-n="0"/>
+      <text class="clickable" text-anchor="middle" alignment-baseline="central" onclick='switchText(this)'>B♭</text>
+  </g>
+  <g id="g12" transform="translate(75,38.4)">
+      <circle class="off" id="c12" cx="0" cy="0" r="22" stroke="black" stroke-width="2" data-n="0"/>
+      <text text-anchor="middle" alignment-baseline="central">B</text>
+  </g>
+
+  <!-- spacer -->
+
+  <circle id="button1" onclick='switchLayout()' class="clickable" cx="125" cy="125", r="60", fill="white"/>
+
+
   <defs>
-        <linearGradient id="MyGradient" gradientTransform="rotate(90)">
+        <linearGradient id="NoteOnGradient" gradientTransform="rotate(90)">
           <stop offset="0%" stop-color="#33f14e" />
           <stop offset="100%" stop-color="#1dcf01" />
         </linearGradient>
   </defs>
-</svg> 
+</svg>
+<div id="infobox">Click the middle of the circle to switch layout (Circle of Fifths or chromatic).<br>Click on a note with an accidental to switch between sharps and flats.<div>
 </div>
+<script>
+setTimeout(function () {
+var sheet = window.document.styleSheets[0];
+sheet.insertRule('#infobox { opacity: 0; transition: opacity 2s}', sheet.cssRules.length);
+}, 5000)
+</script>
+<script src="main.js"></script>
 </body>
 </html>
