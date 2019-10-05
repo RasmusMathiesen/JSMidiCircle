@@ -67,9 +67,12 @@ function switchText(element) {
   }
 }
 
+try {
 WebMidi.enable(function (err) {
     if (err) {
     console.log("WebMidi could not be enabled.", err);
+    alert("WebMidi could not be enabled. This utility is designed to work with the latest version of Google Chrome for PC.");
+    return
     } else {
     console.log("WebMidi enabled!");
     }
@@ -78,13 +81,17 @@ WebMidi.enable(function (err) {
 
     var noteArray = new Array(12).fill(0); //12 zeroes,
     //noteArray contains -1 if the note is sustained, otherwise the number of keys of that note currently pressed
-
+    
     console.log("Number of input devices:", WebMidi.inputs.length);
-    var input = WebMidi.inputs[0]; //First and best input device
-
-    if (input === undefined) {
-      return;
+    if (WebMidi.inputs.length == 0)
+    {
+      alert('No MIDI input detected\nThis utility can only be used with a MIDI input.');
+      return
     }
+    if (WebMidi.inputs.length > 1)
+    {alert("Warning: More than one MIDI input detected.\nThere's currently no way to select which device to use.\nFirst device detected will be used.")}
+
+    var input = WebMidi.inputs[0]; //First and best input device
 
     function update(state, e) {
       var note = e.note.number % 12; //0 is C, 1 is Db etc.
@@ -139,3 +146,8 @@ WebMidi.enable(function (err) {
             }
     );
 });
+}
+catch (error) {
+  console.error(error);
+  alert("WebMIDI.js could not be initialized.\nThis utility is designed to work with the latest version of Google Chrome for PC.\n\n" + error)
+}
